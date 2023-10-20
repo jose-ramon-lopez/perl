@@ -144,46 +144,77 @@ while ( $sel->can_read ) {
                         my $match = "";
                         my $action = "";
 
-                        for my $key ( keys %configFile) {
+                        for my $secondKey ( keys %{ $configFile{ "job"  }} ) {
 
-                                #print "KEY: $key\n";
+                                #print "SECOND KEY: #$secondKey#\n";
 
-                                for my $secondKey ( keys %{ $configFile{ $key  }} ) {
+                                if ( $job =~ m/$secondKey/ ) {
+                                        #print "MATCH: $secondKey - $row\n";
+                                        # $& la parte que hizo match
+                                        # $` la parte anterior al match
+                                        # $' la parte posterior al match
+                                        my $matchLength = length($&);
 
-                                        #print "SECOND KEY: #$secondKey#\n";
-
-                                        if ( $job =~ m/$secondKey/ ) {
-                                                #print "MATCH: $secondKey - $row\n";
-                                                # $& la parte que hizo match
-                                                # $` la parte anterior al match
-                                                # $' la parte posterior al match
-                                                my $matchLength = length($&);
-
-                                                if ($matchLength > $maxMatchLength )  {
-                                                        $match = $&;
-                                                        $action = $configFile{$key}{$secondKey};
-                                                        $maxMatchLength = $matchLength;
-                                                }
-                                                #print "MATCH: $& LENGTH: $matchLength ACTION: $configFile{$key}{$secondKey}\n";
-
+                                        if ($matchLength > $maxMatchLength )  {
+                                                $match = $&;
+                                                $action = $configFile{ "job" }{$secondKey};
+                                                $maxMatchLength = $matchLength;
                                         }
-
-                                        #if ($maxMatchLength != 0 ) {
-                                        #               print "MATCH: $match LENGTH: $maxMatchLength ACTION: $action \n";
-                                        #}
-
+                                        #print "MATCH: $& LENGTH: $matchLength ACTION: $configFile{$key}{$secondKey}\n";
 
                                 }
+
+                                #if ($maxMatchLength != 0 ) {
+                                #               print "MATCH: $match LENGTH: $maxMatchLength ACTION: $action \n";
+                                #}
+
 
                         }
 
                         if ($maxMatchLength != 0 ) {
                                 print "JOBNAME: $job RC: $rc MATCH: $match LENGTH: $maxMatchLength ACTION: $action \n\n";
                         }
+                ## machine unavailable
+                } elsif ( $row =~ m/MACHINE: (.*) MESSAGE: UNAVILABLE/ ) {
+                        my $machine = $1;
+
+                        my $maxMatchLength = 0;
+                        my $match = "";
+                        my $action = "";
+
+                        for my $secondKey ( keys %{ $configFile{ "machine"  }} ) {
+                                #print "SECOND KEY: #$secondKey#\n";
+
+                                if ( $machine =~ m/$secondKey/ ) {
+                                        #print "MATCH: $secondKey - $row\n";
+                                        # $& la parte que hizo match
+                                        # $` la parte anterior al match
+                                        # $' la parte posterior al match
+                                        my $matchLength = length($&);
+
+                                        if ($matchLength > $maxMatchLength )  {
+                                                $match = $&;
+                                                $action = $configFile{ "machine" }{$secondKey};
+                                                $maxMatchLength = $matchLength;
+                                        }
+                                        #print "MATCH: $& LENGTH: $matchLength ACTION: $configFile{$key}{$secondKey}\n";
+
+                                }
+
+                                #if ($maxMatchLength != 0 ) {
+                                #               print "MATCH: $match LENGTH: $maxMatchLength ACTION: $action \n";
+                                #}
+
+                        }
+
+                        if ($maxMatchLength != 0 ) {
+                                print "MACHINE: $machine MATCH: $match LENGTH: $maxMatchLength ACTION: $action \n\n";
+                        }
+
+
                 } else {
                         next;
                         # otras alertas
                 }
         }
 }
-
